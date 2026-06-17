@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>压测报告 - https://dummyjson.com/auth/login</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f6fa; padding: 24px; }
+  h1 { background: linear-gradient(135deg, #2c3e50, #e74c3c); color: #fff; padding: 24px; border-radius: 8px; margin-bottom: 24px; }
+  .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .card { background: #fff; border-radius: 8px; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  .card .value { font-size: 28px; font-weight: bold; color: #2c3e50; }
+  .card .label { font-size: 13px; color: #888; margin-top: 4px; }
+  .card.success .value { color: #27ae60; }
+  .card.failure .value { color: #e74c3c; }
+  .chart-section { margin-bottom: 24px; }
+  .chart-section h2 { margin-bottom: 12px; color: #2c3e50; border-left: 4px solid #3498db; padding-left: 12px; }
+  .chart-section img { width: 100%; max-width: 900px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  .errors { background: #fff; border-radius: 8px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  .errors h2 { color: #e74c3c; margin-bottom: 12px; }
+  .errors table { width: 100%; border-collapse: collapse; }
+  .errors td { padding: 6px; border-bottom: 1px solid #eee; font-size: 12px; font-family: Menlo, monospace; }
+  .error-msg { color: #e74c3c; word-break: break-all; }
+</style>
+</head>
+<body>
+<h1>压测报告 - https://dummyjson.com/auth/login</h1>
+
+<div class="summary">
+  <div class="card">
+    <div class="value">80</div>
+    <div class="label">Total Requests</div>
+  </div>
+  <div class="card success">
+    <div class="value">73.8%</div>
+    <div class="label">Success Rate</div>
+  </div>
+  <div class="card">
+    <div class="value">0.2</div>
+    <div class="label">Throughput (RPS)</div>
+  </div>
+  <div class="card">
+    <div class="value">24132ms</div>
+    <div class="label">Avg Latency</div>
+  </div>
+  <div class="card">
+    <div class="value">907ms</div>
+    <div class="label">Min Latency</div>
+  </div>
+  <div class="card">
+    <div class="value">60858ms</div>
+    <div class="label">Max Latency</div>
+  </div>
+  <div class="card">
+    <div class="value">30918ms</div>
+    <div class="label">P50</div>
+  </div>
+  <div class="card">
+    <div class="value">60034ms</div>
+    <div class="label">P90</div>
+  </div>
+  <div class="card">
+    <div class="value">60134ms</div>
+    <div class="label">P95</div>
+  </div>
+  <div class="card">
+    <div class="value">60858ms</div>
+    <div class="label">P99</div>
+  </div>
+  <div class="card">
+    <div class="value">365.1s</div>
+    <div class="label">Duration</div>
+  </div>
+</div>
+
+<div class="chart-section">
+  <h2>Response Time Distribution</h2>
+  <img src="latency_dist_20260616_164914.png" alt="Latency Distribution">
+</div>
+
+<div class="chart-section">
+  <h2>Response Time Over Time</h2>
+  <img src="latency_scatter_20260616_164914.png" alt="Latency Scatter">
+</div>
+
+<div class="chart-section">
+  <h2>Success / Failure</h2>
+  <img src="status_pie_20260616_164914.png" alt="Status Pie">
+</div>
+
+<div class="chart-section">
+  <h2>Latency Percentiles</h2>
+  <img src="percentiles_20260616_164914.png" alt="Percentiles Bar">
+</div>
+
+<div class="errors">
+  <h2>Errors (21)</h2>
+  <table><tr><td class='error-msg'>[thread-1] ConnectTimeout: HTTPSConnectionPool(host='dummyjson.com', port=443): Max retries exceeded with url: /auth/login (Caused by ConnectTimeoutError(<HTTPSConnection(host='dummyjson.com', port=443) at 0x107b866d0>, 'Connection to dummyjson.com timed out. (connect timeout=30)'))</td></tr><tr><td class='error-msg'>[thread-8] ConnectTimeout: HTTPSConnectionPool(host='dummyjson.com', port=443): Max retries exceeded with url: /auth/login (Caused by ConnectTimeoutError(<HTTPSConnection(host='dummyjson.com', port=443) at 0x107bf9d60>, 'Connection to dummyjson.com timed out. (connect timeout=30)'))</td></tr><tr><td class='error-msg'>[thread-7] ConnectTimeout: HTTPSConnectionPool(host='dummyjson.com', port=443): Max retries exceeded with url: /auth/login (Caused by ConnectTimeoutError(<HTTPSConnection(host='dummyjson.com', port=443) at 0x107bf9130>, 'Connection to dummyjson.com timed out. (connect timeout=30)'))</td></tr><tr><td class='error-msg'>[thread-2] ConnectTimeout: HTTPSConnectionPool(host='dummyjson.com', port=443): Max retries exceeded with url: /auth/login (Caused by ConnectTimeoutError(<HTTPSConnection(host='dummyjson.com', port=443) at 0x107c32130>, 'Connection to dummyjson.com timed out. (connect timeout=30)'))</td></tr><tr><td class='error-msg'>[thread-6] ConnectTimeout: HTTPSConnectionPool(host='dummyjson.com', port=443): Max retries exceeded with url: /auth/login (Caused by ConnectTimeoutError(<HTTPSConnection(host='dummyjson.com', port=443) at 0x107bed040>, 'Connection to dummyjson.com timed out. (connect timeout=30)'))</td></tr><tr><td class='error-msg'>[thread-9] ConnectTimeout: HTTPSConnectionPool(host='dummyjson.com', port=443): Max retries exceeded with url: /auth/login (Caused by ConnectTimeoutError(<HTTPSConnection(host='dummyjson.com', port=443) at 0x107c3cbe0>, 'Connection to dummyjson.com timed out. (connect timeout=30)'))</td></tr><tr><td class='error-msg'>[thread-4] ConnectTimeout: HTTPSConnectionPool(host='dummyjson.com', port=443): Max retries exceeded with url: /auth/login (Caused by ConnectTimeoutError(<HTTPSConnection(host='dummyjson.com', port=443) at 0x107b8c970>, 'Connection to dummyjson.com timed out. (connect timeout=30)'))</td></tr><tr><td class='error-msg'>[thread-3] ConnectTimeout: HTTPSConnectionPool(host='dummyjson.com', port=443): Max retries exceeded with url: /auth/login (Caused by ConnectTimeoutError(<HTTPSConnection(host='dummyjson.com', port=443) at 0x107c3cf70>, 'Connection to dummyjson.com timed out. (connect timeout=30)'))</td></tr><tr><td class='error-msg'>[thread-7] ConnectTimeout: HTTPSConnectionPool(host='dummyjson.com', port=443): Max retries exceeded with url: /auth/login (Caused by ConnectTimeoutError(<HTTPSConnection(host='dummyjson.com', port=443) at 0x107c37f40>, 'Connection to dummyjson.com timed out. (connect timeout=30)'))</td></tr><tr><td class='error-msg'>[thread-8] ConnectTimeout: HTTPSConnectionPool(host='dummyjson.com', port=443): Max retries exceeded with url: /auth/login (Caused by ConnectTimeoutError(<HTTPSConnection(host='dummyjson.com', port=443) at 0x107bf98b0>, 'Connection to dummyjson.com timed out. (connect timeout=30)'))</td></tr><tr><td class='error-msg'>[thread-2] ConnectTimeout: HTTPSConnectionPool(host='dummyjson.com', port=443): Max retries exceeded with url: /auth/login (Caused by ConnectTimeoutError(<HTTPSConnection(host='dummyjson.com', port=443) at 0x107b86ac0>, 'Connection to dummyjson.com timed out. (connect timeout=30)'))</td></tr><tr><td class='error-msg'>[thread-5] ConnectTimeout: HTTPSConnectionPool(host='dummyjson.com', port=443): Max retries exceeded with url: /auth/login (Caused by ConnectTimeoutError(<HTTPSConnection(host='dummyjson.com', port=443) at 0x107c3c340>, 'Connection to dummyjson.com timed out. (connect timeout=30)'))</td></tr><tr><td class='error-msg'>[thread-1] ConnectTimeout: HTTPSConnectionPool(host='dummyjson.com', port=443): Max retries exceeded with url: /auth/login (Caused by ConnectTimeoutError(<HTTPSConnection(host='dummyjson.com', port=443) at 0x107bf9730>, 'Connection to dummyjson.com timed out. (connect timeout=30)'))</td></tr><tr><td class='error-msg'>[thread-3] ConnectTimeout: HTTPSConnectionPool(host='dummyjson.com', port=443): Max retries exceeded with url: /auth/login (Caused by ConnectTimeoutError(<HTTPSConnection(host='dummyjson.com', port=443) at 0x107c3c160>, 'Connection to dummyjson.com timed out. (connect timeout=30)'))</td></tr><tr><td class='error-msg'>[thread-8] ConnectTimeout: HTTPSConnectionPool(host='dummyjson.com', port=443): Max retries exceeded with url: /auth/login (Caused by ConnectTimeoutError(<HTTPSConnection(host='dummyjson.com', port=443) at 0x107c3c5e0>, 'Connection to dummyjson.com timed out. (connect timeout=30)'))</td></tr><tr><td class='error-msg'>[thread-4] ConnectTimeout: HTTPSConnectionPool(host='dummyjson.com', port=443): Max retries exceeded with url: /auth/login (Caused by ConnectTimeoutError(<HTTPSConnection(host='dummyjson.com', port=443) at 0x107c4d370>, 'Connection to dummyjson.com timed out. (connect timeout=30)'))</td></tr><tr><td class='error-msg'>[thread-7] ConnectTimeout: HTTPSConnectionPool(host='dummyjson.com', port=443): Max retries exceeded with url: /auth/login (Caused by ConnectTimeoutError(<HTTPSConnection(host='dummyjson.com', port=443) at 0x107c3cdf0>, 'Connection to dummyjson.com timed out. (connect timeout=30)'))</td></tr><tr><td class='error-msg'>[thread-4] ConnectTimeout: HTTPSConnectionPool(host='dummyjson.com', port=443): Max retries exceeded with url: /auth/login (Caused by ConnectTimeoutError(<HTTPSConnection(host='dummyjson.com', port=443) at 0x107c32cd0>, 'Connection to dummyjson.com timed out. (connect timeout=30)'))</td></tr><tr><td class='error-msg'>[thread-5] ConnectTimeout: HTTPSConnectionPool(host='dummyjson.com', port=443): Max retries exceeded with url: /auth/login (Caused by ConnectTimeoutError(<HTTPSConnection(host='dummyjson.com', port=443) at 0x107c044f0>, 'Connection to dummyjson.com timed out. (connect timeout=30)'))</td></tr><tr><td class='error-msg'>[thread-8] ConnectTimeout: HTTPSConnectionPool(host='dummyjson.com', port=443): Max retries exceeded with url: /auth/login (Caused by ConnectTimeoutError(<HTTPSConnection(host='dummyjson.com', port=443) at 0x107c18af0>, 'Connection to dummyjson.com timed out. (connect timeout=30)'))</td></tr></table>
+  <p style='color:#888;margin-top:8px'>... 仅展示前 20 条</p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% block title %}用例管理 - 自动化测试平台{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h2>用例管理</h2>
+  <div style="margin-top:8px;">
+    <button class="btn btn-primary" onclick="openModal()">+ 新建用例</button>
+    <button class="btn btn-success" onclick="runSelected()">执行选中</button>
+    <select id="filterCategory" onchange="loadCases()" style="padding:6px 12px;border-radius:6px;border:1px solid #ddd;margin-left:8px;">
+      <option value="">全部分类</option>
+      <option value="smoke">冒烟测试</option>
+      <option value="positive">正向场景</option>
+      <option value="negative">异常场景</option>
+      <option value="structure">结构校验</option>
+    </select>
+  </div>
+</div>
+
+<div id="runningBar" class="running-indicator">
+  <div class="spinner"></div> <span>测试执行中，请稍候...</span>
+</div>
+
+<table id="caseTable" style="font-size:12px;">
+  <thead>
+    <tr>
+      <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+      <th>case_id</th><th>描述</th><th>method</th><th>path</th>
+      <th>分类</th><th>状态码</th><th>提取</th><th>操作</th>
+    </tr>
+  </thead>
+  <tbody><tr><td colspan="9" style="color:#888;">加载中...</td></tr></tbody>
+</table>
+
+<!-- 编辑弹窗 -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3 id="modalTitle">新建用例</h3>
+    <form id="caseForm" onsubmit="saveCase(event)">
+      <input type="hidden" id="editId">
+      <div class="form-row">
+        <div class="form-group"><label>case_id *</label><input id="f_case_id" required></div>
+        <div class="form-group"><label>描述</label><input id="f_description"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>method</label>
+          <select id="f_method"><option>GET</option><option>POST</option><option>PUT</option><option>DELETE</option></select>
+        </div>
+        <div class="form-group"><label>path</label><input id="f_path" placeholder="/auth/login"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>headers (JSON)</label><textarea id="f_headers" rows="2" placeholder='{"Authorization":"Bearer {{token}}"}'></textarea></div>
+        <div class="form-group"><label>body (JSON)</label><textarea id="f_body" rows="2" placeholder='{"username":"emilys","password":"emilyspass"}'></textarea></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>预期状态码</label><input id="f_expected_status" type="number" value="200"></div>
+        <div class="form-group"><label>expected_contains (;;分隔)</label><input id="f_expected_contains" placeholder="accessToken;;username"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>分类</label>
+          <select id="f_category"><option value="smoke">冒烟测试</option><option value="positive">正向场景</option><option value="negative">异常场景</option><option value="structure">结构校验</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>extract_path</label><input id="f_extract_path" placeholder="accessToken"></div>
+        <div class="form-group"><label>save_as</label><input id="f_save_as" placeholder="token"></div>
+      </div>
+      <div style="margin-top:16px;text-align:right;">
+        <button type="button" class="btn" onclick="closeModal()" style="background:#95a5a6;color:#fff;">取消</button>
+        <button type="submit" class="btn btn-primary">保存</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  let allCases = [];
+
+  function getFormData() {
+    return {
+      case_id: document.getElementById('f_case_id').value.trim(),
+      description: document.getElementById('f_description').value,
+      method: document.getElementById('f_method').value,
+      path: document.getElementById('f_path').value,
+      headers: document.getElementById('f_headers').value,
+      body: document.getElementById('f_body').value,
+      expected_status: parseInt(document.getElementById('f_expected_status').value) || 200,
+      expected_contains: document.getElementById('f_expected_contains').value,
+      category: document.getElementById('f_category').value,
+      extract_path: document.getElementById('f_extract_path').value,
+      save_as: document.getElementById('f_save_as').value,
+    };
+  }
+
+  function setFormData(c) {
+    document.getElementById('editId').value = c.id || '';
+    document.getElementById('f_case_id').value = c.case_id || '';
+    document.getElementById('f_description').value = c.description || '';
+    document.getElementById('f_method').value = c.method || 'GET';
+    document.getElementById('f_path').value = c.path || '';
+    document.getElementById('f_headers').value = c.headers || '';
+    document.getElementById('f_body').value = c.body || '';
+    document.getElementById('f_expected_status').value = c.expected_status ?? 200;
+    document.getElementById('f_expected_contains').value = c.expected_contains || '';
+    document.getElementById('f_category').value = c.category || 'smoke';
+    document.getElementById('f_extract_path').value = c.extract_path || '';
+    document.getElementById('f_save_as').value = c.save_as || '';
+  }
+
+  function openModal(caseData) {
+    document.getElementById('modalTitle').textContent = caseData ? '编辑用例' : '新建用例';
+    setFormData(caseData || {});
+    document.getElementById('modal').classList.add('show');
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('show');
+  }
+
+  async function saveCase(e) {
+    e.preventDefault();
+    const data = getFormData();
+    const editId = document.getElementById('editId').value;
+
+    let res;
+    if (editId) {
+      res = await api('/api/testcases/' + editId, { method: 'PUT', body: JSON.stringify(data) });
+    } else {
+      res = await api('/api/testcases', { method: 'POST', body: JSON.stringify(data) });
+    }
+
+    if (res.error) { showToast(res.error, 'error'); return; }
+    showToast(editId ? '更新成功' : '创建成功', 'success');
+    closeModal();
+    loadCases();
+  }
+
+  async function editCase(id) {
+    const c = allCases.find(x => x.id === id);
+    if (c) openModal(c);
+  }
+
+  async function deleteCase(id) {
+    if (!confirm('确认删除此用例？')) return;
+    await api('/api/testcases/' + id, { method: 'DELETE' });
+    showToast('已删除', 'success');
+    loadCases();
+  }
+
+  function toggleSelectAll() {
+    const checked = document.getElementById('selectAll').checked;
+    document.querySelectorAll('.case-check').forEach(cb => cb.checked = checked);
+  }
+
+  function getSelectedIds() {
+    return Array.from(document.querySelectorAll('.case-check:checked')).map(cb => cb.value);
+  }
+
+  async function loadCases() {
+    const cat = document.getElementById('filterCategory')?.value || '';
+    const url = cat ? '/api/testcases?category=' + cat : '/api/testcases';
+    allCases = await api(url);
+    const tbody = document.querySelector('#caseTable tbody');
+    if (!allCases.length) {
+      tbody.innerHTML = '<tr><td colspan="9" style="color:#888;">暂无用例，点击「新建用例」开始</td></tr>';
+      return;
+    }
+    const catLabel = {'smoke':'冒烟测试','positive':'正向场景','negative':'异常场景','structure':'结构校验'};
+    const catBadge = c => `<span class="badge badge-${c}">${catLabel[c] || c}</span>`;
+    tbody.innerHTML = allCases.map(c => `
+      <tr>
+        <td><input type="checkbox" class="case-check" value="${c.case_id}"></td>
+        <td><strong>${c.case_id}</strong></td>
+        <td>${c.description||'-'}</td>
+        <td>${c.method}</td>
+        <td style="font-family:Menlo;font-size:11px;">${c.path||'-'}</td>
+        <td>${catBadge(c.category)}</td>
+        <td>${c.expected_status}</td>
+        <td>${c.save_as ? c.extract_path+' → <strong>'+c.save_as+'</strong>' : '-'}</td>
+        <td>
+          <button class="btn btn-primary btn-sm" onclick="editCase(${c.id})">编辑</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteCase(${c.id})">删除</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  async function runSelected() {
+    const ids = getSelectedIds();
+    if (!ids.length) { showToast('请先选中用例', 'error'); return; }
+    if (!confirm(`执行选中的 ${ids.length} 个用例？`)) return;
+    document.getElementById('runningBar').classList.add('show');
+    try {
+      const res = await api('/api/run', { method: 'POST', body: JSON.stringify({case_ids: ids}) });
+      if (res.error) { showToast(res.error, 'error'); return; }
+      showToast(`执行完成: ${res.passed}通过 ${res.failed}失败`, res.failed>0?'error':'success');
+      if (res.report_url) window.open(res.report_url, '_blank');
+    } finally {
+      document.getElementById('runningBar').classList.remove('show');
+    }
+  }
+
+  loadCases();
+</script>
+{% endblock %}

@@ -7,7 +7,9 @@
     3. 将服务账号邮箱添加为表格的查看者
 
 表格格式同 Excel：
-    case_id | description | method | path | headers | body | expected_status | expected_contains | category
+    case_id | description | method | path | headers | body
+    | expected_status | expected_contains | category
+    | extract_path | save_as
 
 也支持公开只读表格（无需鉴权），通过 CSV 导出 URL 读取。
 """
@@ -39,6 +41,9 @@ def _parse_rows(rows: list, headers: list) -> List[Dict[str, Any]]:
 
         raw_contains = case.get("expected_contains") or ""
         case["expected_contains"] = [s.strip() for s in raw_contains.split(";;") if s.strip()]
+
+        case["extract_path"] = (case.get("extract_path") or "").strip()
+        case["save_as"] = (case.get("save_as") or "").strip()
 
         cases.append(case)
     return cases

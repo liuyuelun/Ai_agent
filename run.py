@@ -42,8 +42,6 @@ print()
 
 result = subprocess.run(cmd, cwd=PROJECT_ROOT)
 
-# macOS 自动打开报告
-if sys.platform == "darwin" and result.returncode in (0, 1):
-    subprocess.run(["open", report_path])
-
+print()
+print(f">>> 报告已生成: file://{report_path}")
 sys.exit(result.returncode)

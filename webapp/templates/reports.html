@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}历史报告 - 自动化测试平台{% endblock %}
+{% block content %}
+<div class="page-header"><h2>历史报告</h2></div>
+
+<div class="card" id="reportList">
+  <table>
+    <thead><tr><th>ID</th><th>时间</th><th>总数</th><th>通过</th><th>失败</th><th>跳过</th><th>耗时</th><th>操作</th></tr></thead>
+    <tbody id="runsTbody"><tr><td colspan="8" style="color:#888;">加载中...</td></tr></tbody>
+  </table>
+</div>
+
+<div class="card" id="reportViewer" style="display:none;">
+  <div style="margin-bottom:8px;">
+    <button class="btn btn-sm" onclick="closeReport()" style="background:#95a5a6;color:#fff;">← 返回列表</button>
+  </div>
+  <iframe class="report-frame" id="reportFrame"></iframe>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  async function loadRuns() {
+    const runs = await api('/api/reports');
+    const tbody = document.getElementById('runsTbody');
+    if (!runs.length) { tbody.innerHTML = '<tr><td colspan="8" style="color:#888;">暂无执行记录</td></tr>'; return; }
+    tbody.innerHTML = runs.map(r => `
+      <tr>
+        <td>#${r.id}</td>
+        <td>${r.created_at}</td>
+        <td>${r.total}</td>
+        <td style="color:#27ae60;">${r.passed}</td>
+        <td style="color:${r.failed>0?'#e74c3c':'#888'};">${r.failed}</td>
+        <td>${r.skipped}</td>
+        <td>${r.duration?.toFixed(1)}s</td>
+        <td>
+          <button class="btn btn-primary btn-sm" onclick="viewReport('${r.report_filename}')">查看</button>
+          <a href="/reports/${r.report_filename}" target="_blank" class="btn btn-sm" style="background:#8e44ad;color:#fff;">新窗口</a>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function viewReport(filename) {
+    document.getElementById('reportList').style.display = 'none';
+    document.getElementById('reportViewer').style.display = 'block';
+    document.getElementById('reportFrame').src = '/reports/' + filename;
+  }
+
+  function closeReport() {
+    document.getElementById('reportList').style.display = 'block';
+    document.getElementById('reportViewer').style.display = 'none';
+    document.getElementById('reportFrame').src = '';
+  }
+
+  loadRuns();
+</script>
+{% endblock %}
