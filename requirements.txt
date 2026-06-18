@@ -1,7 +1,25 @@
+# 测试框架
 pytest>=8.0
 pytest-html>=4.0
+
+# HTTP 客户端
 requests>=2.28
-PyJWT>=2.8
+
+# Excel 读写
 openpyxl>=3.0
+
+# Google Sheets（可选）
 gspread>=6.0
 oauth2client>=4.1
+
+# JWT 解析
+PyJWT>=2.8
+
+# Web 平台
+flask>=3.0
+
+# 压测图表
+matplotlib>=3.5
+
+# 生产环境 WSGI 服务器
+gunicorn>=22.0
